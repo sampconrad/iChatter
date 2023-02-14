@@ -7,10 +7,10 @@ import { PubSub } from 'graphql-subscriptions';
 export interface GraphQLContext {
   session: Session | null;
   prisma: PrismaClient;
-  pubsub: PubSub
+  pubsub: PubSub;
 }
 
-// Users
+// USERS
 export interface Session {
   user: User;
   expires: ISODateString;
@@ -44,3 +44,11 @@ export type ConversationPopulated = Prisma.ConversationGetPayload<{
 export type ParticipantPopulated = Prisma.ConversationParticipantGetPayload<{
   include: typeof participantPopulated;
 }>;
+
+// MESSAGES
+export interface SendMessageArguments {
+  id: string;
+  conversationId: string;
+  senderId: string;
+  body: string;
+}
