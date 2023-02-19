@@ -7,6 +7,7 @@ import { ConversationsData } from '@/util/types';
 import { ConversationPopulated } from '../../../../../backend/src/util/types';
 import React, { useEffect } from 'react';
 import { useRouter } from 'next/router';
+import SkeletonLoader from '@/components/common/SkeletonLoader';
 
 interface ConversationsWrapperProps {
   session: Session;
@@ -32,7 +33,12 @@ const ConversationsWrapper: React.FC<ConversationsWrapperProps> = ({ session }) 
   const subscribeToNewConversations = () => {
     subscribeToMore({
       document: ConversationOperations.Subscriptions.conversationCreated,
-      updateQuery: (prev, { subscriptionData }: { subscriptionData: { data: { conversationCreated: ConversationPopulated } } }) => {
+      updateQuery: (
+        prev,
+        {
+          subscriptionData,
+        }: { subscriptionData: { data: { conversationCreated: ConversationPopulated } } }
+      ) => {
         if (!subscriptionData.data) return prev;
 
         const newConversation = subscriptionData.data.conversationCreated;
@@ -52,15 +58,23 @@ const ConversationsWrapper: React.FC<ConversationsWrapperProps> = ({ session }) 
     <Box
       display={{ base: conversationId ? 'none' : 'flex', md: 'flex' }}
       width={{ base: '100%', md: '400px' }}
+      flexDirection='column'
       bg='whiteAlpha.50'
+      gap={4}
       py={6}
       px={3}>
-      {/* Skeleton loader */}
-      <ConversationList
-        session={session}
-        conversations={conversationsData?.conversations || []}
-        onViewConversation={onViewConversation}
-      />
+      {conversationsLoading ? (
+        <SkeletonLoader
+          count={7}
+          height='80px'
+        />
+      ) : (
+        <ConversationList
+          session={session}
+          conversations={conversationsData?.conversations || []}
+          onViewConversation={onViewConversation}
+        />
+      )}
     </Box>
   );
 };

@@ -1,9 +1,68 @@
 import { Prisma } from '@prisma/client';
-import { GraphQLError } from 'graphql';
-import { GraphQLContext, SendMessageArguments } from '../../util/types';
+import { graphql, GraphQLError } from 'graphql';
+import { withFilter } from 'graphql-subscriptions';
+import { userIsConversationParticipant } from '../../util/functions';
+import {
+  GraphQLContext,
+  MessagePopulated,
+  MessageSentSubscriptionPayload,
+  SendMessageArguments,
+} from '../../util/types';
+import { conversationPopulated } from './conversation';
 
 const resolvers = {
-  Query: {},
+  Query: {
+    messages: async function (
+      _: any,
+      args: { conversationId: string },
+      context: GraphQLContext
+    ): Promise<Array<MessagePopulated>> {
+      const { session, prisma } = context;
+      const { conversationId } = args;
+
+      if (!session?.user) {
+        throw new GraphQLError('Not Authorized');
+      }
+
+      const {
+        user: { id: userId },
+      } = session;
+
+      // verify that user is a participant
+      const conversation = await prisma.conversation.findUnique({
+        where: {
+          id: conversationId,
+        },
+        include: conversationPopulated,
+      });
+
+      if (!conversation) {
+        throw new GraphQLError('Conversation Not Found');
+      }
+
+      const allowedToView = userIsConversationParticipant(conversation.participants, userId);
+
+      if (!allowedToView) {
+        throw new GraphQLError('Not Authorized');
+      }
+
+      try {
+        const messages = await prisma.message.findMany({
+          where: {
+            conversationId,
+          },
+          include: messagePopulated,
+          orderBy: {
+            createdAt: 'desc',
+          },
+        });
+        return messages;
+      } catch (error: any) {
+        console.log('messages error', error);
+        throw new GraphQLError(error?.message);
+      }
+    },
+  },
   Mutation: {
     sendMessage: async function (
       _: any,
@@ -24,6 +83,7 @@ const resolvers = {
       }
 
       try {
+        // create new message entity
         const newMessage = await prisma.message.create({
           data: {
             id: messageId,
@@ -34,6 +94,20 @@ const resolvers = {
           include: messagePopulated,
         });
 
+        // Find conversation participant entity
+        const participant = await prisma.conversationParticipant.findFirst({
+          where: {
+            userId,
+            conversationId
+          }
+        })
+
+        if (!participant) {
+          throw new GraphQLError('Participant does not exist')
+        }
+
+
+        // updated conversation entity
         const conversation = await prisma.conversation.update({
           where: {
             id: conversationId,
@@ -43,7 +117,7 @@ const resolvers = {
             participants: {
               update: {
                 where: {
-                  id: senderId,
+                  id: participant.id,
                 },
                 data: {
                   hasSeenLatestMessage: true,
@@ -52,7 +126,7 @@ const resolvers = {
               updateMany: {
                 where: {
                   NOT: {
-                    userId: senderId,
+                    userId,
                   },
                 },
                 data: {
@@ -61,6 +135,7 @@ const resolvers = {
               },
             },
           },
+          include: conversationPopulated,
         });
 
         pubsub.publish('MESSAGE_SENT', { messageSent: newMessage });
@@ -75,8 +150,21 @@ const resolvers = {
   },
   Subscription: {
     messageSent: {
-      
-    }
+      subscribe: withFilter(
+        (_: any, __: any, context: GraphQLContext) => {
+          const { pubsub } = context;
+
+          return pubsub.asyncIterator(['MESSAGE_SENT']);
+        },
+        (
+          payload: MessageSentSubscriptionPayload,
+          args: { conversationId: string },
+          context: GraphQLContext
+        ) => {
+          return payload.messageSent.conversationId === args.conversationId;
+        }
+      ),
+    },
   },
 };
 
