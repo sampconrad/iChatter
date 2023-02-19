@@ -16,7 +16,7 @@ const formatRelativeLocale = {
 };
 
 const MessageItem: React.FC<MessageItemProps> = ({ message, sentByMe }) => {
-  console.log(message);
+
   return (
     <Stack
       direction='row'
@@ -25,9 +25,10 @@ const MessageItem: React.FC<MessageItemProps> = ({ message, sentByMe }) => {
       _hover={{ bg: 'whiteAlpha.200' }}
       justify={sentByMe ? 'flex-end' : 'flex-start'}
       wordBreak='break-word'>
-      {!sentByMe && (
+      {!sentByMe && message.sender.image && (
         <Flex align='flex-end'>
           <Avatar
+            src={message.sender.image}
             size='sm'
             borderColor='papayawhip'></Avatar>
         </Flex>
@@ -69,6 +70,14 @@ const MessageItem: React.FC<MessageItemProps> = ({ message, sentByMe }) => {
           </Box>
         </Flex>
       </Stack>
+      {/* { message.sender.image && (
+        <Flex align='flex-end'>
+          <Avatar
+            src={message.sender.image}
+            size='sm'
+            borderColor='papayawhip'></Avatar>
+        </Flex>
+      )} */}
     </Stack>
   );
 };
