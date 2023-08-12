@@ -1,6 +1,6 @@
 # iChatter
 
-Demo: https://icevbot.netlify.app/
+Demo: tbd.
 
 ## About
 
