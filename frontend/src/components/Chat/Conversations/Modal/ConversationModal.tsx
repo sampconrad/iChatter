@@ -85,7 +85,7 @@ const ConversationModal: React.FC<ConversationModalProps> = ({ session, isOpen, 
         onClose={onClose}>
         <ModalOverlay />
         <ModalContent
-          bg='#2D3748'
+          bg='brand.800'
           pb={4}>
           <ModalHeader>Create a Conversation</ModalHeader>
           <ModalCloseButton />

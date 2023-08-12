@@ -21,10 +21,9 @@ interface ConversationItemProps {
   conversation: ConversationPopulated;
   onClick: () => void;
   isSelected: boolean;
-  // hasSeenLatestMessage: boolean | undefined;
-  // onDeleteConversation: (conversationId: string) => void;
+  hasSeenLatestMessage?: boolean;
+  onDeleteConversation: (conversationId: string) => void;
   //   onEditConversation?: () => void;
-  //   hasSeenLatestMessage?: boolean;
   //   selectedConversationId?: string;
   //   onLeaveConversation?: (conversation: ConversationPopulated) => void;
 }
@@ -34,8 +33,8 @@ const ConversationItem: React.FC<ConversationItemProps> = ({
   conversation,
   onClick,
   isSelected,
-  // hasSeenLatestMessage,
-  // onDeleteConversation,
+  hasSeenLatestMessage,
+  onDeleteConversation,
   //   selectedConversationId,
   //   onEditConversation,
   //   onLeaveConversation,
@@ -45,6 +44,7 @@ const ConversationItem: React.FC<ConversationItemProps> = ({
   const handleClick = (event: React.MouseEvent) => {
     if (event.type === 'click') {
       onClick();
+      console.log('has seen latest:', hasSeenLatestMessage);
     } else if (event.type === 'contextmenu') {
       event.preventDefault();
       setMenuOpen(true);
@@ -80,10 +80,10 @@ const ConversationItem: React.FC<ConversationItemProps> = ({
           </MenuItem>
           <MenuItem
             icon={<MdDeleteOutline fontSize={20} />}
-            // onClick={(event) => {
-            //   event.stopPropagation();
-            //   onDeleteConversation(conversation.id);
-            // }}
+            onClick={(event) => {
+              event.stopPropagation();
+              onDeleteConversation(conversation.id);
+            }}
             bg='#2d2d2d'
             _hover={{ bg: 'whiteAlpha.300' }}>
             Delete
@@ -114,19 +114,19 @@ const ConversationItem: React.FC<ConversationItemProps> = ({
       <Flex
         position='absolute'
         left='-6px'>
-        {/* {hasSeenLatestMessage === false && (
+        {hasSeenLatestMessage === false && (
           <GoPrimitiveDot
             fontSize={18}
-            color='#6B46C1'
+            color='#00ff55'
           />
-        )} */}
+        )}
       </Flex>
 
       {conversation?.participants.length > 2 ? (
         <AvatarGroup
           size='sm'
           max={3}>
-          {conversation?.participants.map((p) =>
+          {conversation?.participants.map((p: any) =>
             p.user.image && typeof p.user.image === 'string' ? (
               <Avatar
                 borderColor='papayawhip'
@@ -134,20 +134,23 @@ const ConversationItem: React.FC<ConversationItemProps> = ({
                 src={p.user.image}
               />
             ) : (
-              <Avatar />
+              <Avatar key={p.user.id}/>
             )
           )}
         </AvatarGroup>
-      ) : conversation?.participants[1].user.image && typeof conversation?.participants[1].user.image === 'string' ? (
+      ) : conversation?.participants[1].user.image &&
+        typeof conversation?.participants[1].user.image === 'string' ? (
         <Avatar
           borderColor='papayawhip'
           src={conversation?.participants[1].user.image}>
-          <AvatarBadge
-            placement='top-start'
-            boxSize='1em'
-            bg='green.400'
-            borderColor='papayawhip'
-          />
+          {hasSeenLatestMessage === false && (
+            <AvatarBadge
+              placement='top-start'
+              boxSize='1em'
+              bg='green.400'
+              borderColor='papayawhip'
+            />
+          )}
         </Avatar>
       ) : (
         <Avatar />
@@ -190,7 +193,8 @@ const ConversationItem: React.FC<ConversationItemProps> = ({
           {formatRelative(new Date(conversation.updatedAt), new Date(), {
             locale: {
               ...enUS,
-              formatRelative: (token) => formatRelativeLocale[token as keyof typeof formatRelativeLocale],
+              formatRelative: (token) =>
+                formatRelativeLocale[token as keyof typeof formatRelativeLocale],
             },
           })}
         </Text>

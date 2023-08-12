@@ -49,32 +49,44 @@ const Auth: React.FunctionComponent<IAuthProps> = ({
   };
 
   return (
-    <Center height="100vh">
-      <Stack align="center" spacing="8">
+    <Center height='100vh'>
+      <Stack
+        align='center'
+        spacing='8'>
         {session ? (
           <>
-            <Text fontSize="3xl">Create a Username</Text>
+            <Text fontSize='3xl'>Create a Username</Text>
             <Input
-              placeholder="Enter a username"
+              placeholder='Enter a username'
               value={username}
               onChange={(event) => setUsername(event.target.value)}
             />
-            <Button width="100%" onClick={onSubmit} isLoading={loading}>
+            <Button
+              width='100%'
+              onClick={onSubmit}
+              isLoading={loading}>
               Save
             </Button>
           </>
         ) : (
           <>
             <Image
-              height="200px"
-              src="/images/full-logo.svg"
-              boxShadow="base"
+              height='200px'
+              alt='avatar'
+              src='/images/full-logo.svg'
+              filter='drop-shadow(2px 2px 4px #00000076)'
             />
             <Button
               onClick={() => signIn('google')}
-              leftIcon={<Image height="20px" src="/images/googlelogo.png" />}
-              bg="brand.50"
-              color="brand.800"
+              leftIcon={
+                <Image
+                  alt='avatar'
+                  height='20px'
+                  src='/images/googlelogo.png'
+                />
+              }
+              bg='brand.50'
+              color='brand.800'
               _hover={{ bg: 'brand.100' }}
               _active={{ bg: 'brand.200' }}>
               Continue with Google
