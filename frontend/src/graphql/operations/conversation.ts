@@ -1,21 +1,20 @@
-/* eslint-disable import/no-anonymous-default-export */
-import { gql } from '@apollo/client';
-import { MessageFields } from './message';
+import { gql } from "@apollo/client";
+import { MessageFields } from "./message";
 
 const ConversationFields = `
-      id
-      participants {
-        user {
-          id
-          username
-          image
-        }
-        hasSeenLatestMessage
+    id
+    participants {
+      user {
+        id
+        username
+        image
       }
-      latestMessage {
-        ${MessageFields}
-      }
-      updatedAt
+      hasSeenLatestMessage
+    }
+    latestMessage {
+      ${MessageFields}
+    }
+    updatedAt
 `;
 
 export default {
@@ -37,37 +36,42 @@ export default {
       }
     `,
     deleteConversation: gql`
-    mutation DeleteConversation($convesationId: String!) {
-      deleteConversation(conversationId: $conversationId)
-    }
+      mutation DeleteConversation($conversationId: String!) {
+        deleteConversation(conversationId: $conversationId)
+      }
     `,
     markConversationAsRead: gql`
-      mutation MarkConversationAsRead($userId: String!, $conversationId: String!) {
+      mutation MarkConversationAsRead(
+        $userId: String!
+        $conversationId: String!
+      ) {
         markConversationAsRead(userId: $userId, conversationId: $conversationId)
       }
     `,
   },
   Subscriptions: {
     conversationCreated: gql`
-    subscription COnversationCreated {
-      conversationCreated {
-        ${ConversationFields}
-      }
-    }
-    `,
-    conversationUpdated: gql`
-    subscription ConversationUpdated {
-      conversationUpdated {
-        conversation {
+      subscription ConversationCreated {
+        conversationCreated {
           ${ConversationFields}
         }
       }
-    }`
+    `,
+    conversationUpdated: gql`
+      subscription ConversationUpdated {
+        conversationUpdated {
+          conversation {
+            ${ConversationFields}
+          }
+        }
+      }
+    `,
+    conversationDeleted: gql`
+      subscription ConversationDeleted {
+        conversationDeleted {
+          id
+        }
+      }
+    `,
   },
-  conversationDeleted: gql`
-  subscription ConversationDeleted {
-    conversationDeleted {
-      id
-    }
-  }`
 };

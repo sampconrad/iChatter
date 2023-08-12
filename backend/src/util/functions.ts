@@ -1,4 +1,4 @@
-import { ParticipantPopulated } from './types';
+import { ParticipantPopulated } from "./types";
 
 export function userIsConversationParticipant(
   participants: Array<ParticipantPopulated>,

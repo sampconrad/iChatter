@@ -1,24 +1,24 @@
-import { gql } from '@apollo/client';
+import { gql } from "@apollo/client";
 
 export const MessageFields = `
-  id
-  sender {
     id
-    username
-    image
-  }
-  body
-  createdAt
+    sender {
+      id
+      username
+      image
+    }
+    body
+    createdAt
 `;
 
 export default {
   Query: {
     messages: gql`
-      query Messages($conversationId: String!) {
-        messages(conversationId: $conversationId) {
-          ${MessageFields}
+        query Messages($conversationId: String!) {
+            messages(conversationId: $conversationId) {
+                 ${MessageFields}
+            }
         }
-      }
     `,
   },
   Mutation: {
@@ -29,17 +29,22 @@ export default {
         $senderId: String!
         $body: String!
       ) {
-        sendMessage(id: $id, conversationId: $conversationId, senderId: $senderId, body: $body)
+        sendMessage(
+          id: $id
+          conversationId: $conversationId
+          senderId: $senderId
+          body: $body
+        )
       }
     `,
   },
   Subscription: {
     messageSent: gql`
-      subscription MessageSent($conversationId: String!) {
-        messageSent(conversationId: $conversationId) {
-          ${MessageFields}
+        subscription MessageSent($conversationId: String!) {
+            messageSent(conversationId: $conversationId) {
+                ${MessageFields}
+            }
         }
-      }
     `,
   },
 };

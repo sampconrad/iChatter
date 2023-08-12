@@ -1,19 +1,29 @@
-import { Avatar, AvatarBadge, AvatarGroup, Box, Flex, Menu, MenuItem, MenuList, Stack, Text } from '@chakra-ui/react';
-import { formatRelative } from 'date-fns';
-import enUS from 'date-fns/locale/en-US';
-import React, { useState } from 'react';
-import { GoPrimitiveDot } from 'react-icons/go';
-import { MdDeleteOutline } from 'react-icons/md';
-import { BiLogOut } from 'react-icons/bi';
-import { AiOutlineEdit } from 'react-icons/ai';
-import { formatUsernames } from '../../../util/functions';
-import { ConversationPopulated } from '../../../../../backend/src/util/types';
+import {
+  Avatar,
+  AvatarGroup,
+  Box,
+  Flex,
+  Menu,
+  MenuItem,
+  MenuList,
+  Stack,
+  Text,
+} from "@chakra-ui/react";
+import { formatRelative } from "date-fns";
+import enUS from "date-fns/locale/en-US";
+import React, { useState } from "react";
+import { GoPrimitiveDot } from "react-icons/go";
+import { MdDeleteOutline } from "react-icons/md";
+import { BiLogOut } from "react-icons/bi";
+import { AiOutlineEdit } from "react-icons/ai";
+import { formatUsernames } from "../../../util/functions";
+import { ConversationPopulated } from "../../../../../backend/src/util/types";
 
 const formatRelativeLocale = {
-  lastWeek: 'eeee',
+  lastWeek: "eeee",
   yesterday: "'Yesterday",
-  today: 'p',
-  other: 'MM/dd/yy',
+  today: "p",
+  other: "MM/dd/yy",
 };
 
 interface ConversationItemProps {
@@ -21,9 +31,10 @@ interface ConversationItemProps {
   conversation: ConversationPopulated;
   onClick: () => void;
   isSelected: boolean;
-  hasSeenLatestMessage?: boolean;
+  hasSeenLatestMessage: boolean | undefined;
   onDeleteConversation: (conversationId: string) => void;
   //   onEditConversation?: () => void;
+  //   hasSeenLatestMessage?: boolean;
   //   selectedConversationId?: string;
   //   onLeaveConversation?: (conversation: ConversationPopulated) => void;
 }
@@ -42,10 +53,9 @@ const ConversationItem: React.FC<ConversationItemProps> = ({
   const [menuOpen, setMenuOpen] = useState(false);
 
   const handleClick = (event: React.MouseEvent) => {
-    if (event.type === 'click') {
+    if (event.type === "click") {
       onClick();
-      console.log('has seen latest:', hasSeenLatestMessage);
-    } else if (event.type === 'contextmenu') {
+    } else if (event.type === "contextmenu") {
       event.preventDefault();
       setMenuOpen(true);
     }
@@ -53,29 +63,29 @@ const ConversationItem: React.FC<ConversationItemProps> = ({
 
   return (
     <Stack
-      direction='row'
-      align='center'
-      justify='space-between'
+      direction="row"
+      align="center"
+      justify="space-between"
       p={4}
-      cursor='pointer'
+      cursor="pointer"
       borderRadius={4}
-      bg={isSelected ? 'whiteAlpha.200' : 'none'}
-      _hover={{ bg: 'whiteAlpha.200' }}
+      bg={isSelected ? "whiteAlpha.200" : "none"}
+      _hover={{ bg: "whiteAlpha.200" }}
       onClick={handleClick}
       onContextMenu={handleClick}
-      position='relative'>
-      <Menu
-        isOpen={menuOpen}
-        onClose={() => setMenuOpen(false)}>
-        <MenuList bg='#2d2d2d'>
+      position="relative"
+    >
+      <Menu isOpen={menuOpen} onClose={() => setMenuOpen(false)}>
+        <MenuList bg="#2d2d2d">
           <MenuItem
             icon={<AiOutlineEdit fontSize={20} />}
             onClick={(event) => {
               event.stopPropagation();
               //   onEditConversation();
             }}
-            bg='#2d2d2d'
-            _hover={{ bg: 'whiteAlpha.300' }}>
+            bg="#2d2d2d"
+            _hover={{ bg: "whiteAlpha.300" }}
+          >
             Edit
           </MenuItem>
           <MenuItem
@@ -84,8 +94,9 @@ const ConversationItem: React.FC<ConversationItemProps> = ({
               event.stopPropagation();
               onDeleteConversation(conversation.id);
             }}
-            bg='#2d2d2d'
-            _hover={{ bg: 'whiteAlpha.300' }}>
+            bg="#2d2d2d"
+            _hover={{ bg: "whiteAlpha.300" }}
+          >
             Delete
           </MenuItem>
           {/* {conversation.participants.length > 2 ? (
@@ -111,17 +122,11 @@ const ConversationItem: React.FC<ConversationItemProps> = ({
           )} */}
         </MenuList>
       </Menu>
-      <Flex
-        position='absolute'
-        left='-6px'>
+      <Flex position="absolute" left="-6px">
         {hasSeenLatestMessage === false && (
-          <GoPrimitiveDot
-            fontSize={18}
-            color='#00ff55'
-          />
+          <GoPrimitiveDot fontSize={18} color="#6B46C1" />
         )}
       </Flex>
-
       {conversation?.participants.length > 2 ? (
         <AvatarGroup
           size='sm'
@@ -143,58 +148,54 @@ const ConversationItem: React.FC<ConversationItemProps> = ({
         <Avatar
           borderColor='papayawhip'
           src={conversation?.participants[1].user.image}>
-          {hasSeenLatestMessage === false && (
+          {/* {hasSeenLatestMessage === false && (
             <AvatarBadge
               placement='top-start'
               boxSize='1em'
               bg='green.400'
               borderColor='papayawhip'
             />
-          )}
+          )} */}
         </Avatar>
       ) : (
         <Avatar />
       )}
-
-      <Flex
-        justify='space-between'
-        width='80%'
-        height='100%'>
-        <Flex
-          direction='column'
-          width='70%'
-          height='100%'>
+      <Flex justify="space-between" width="80%" height="100%">
+        <Flex direction="column" width="70%" height="100%">
           <Text
             fontWeight={600}
-            whiteSpace='nowrap'
-            overflow='hidden'
-            textOverflow='ellipsis'>
+            whiteSpace="nowrap"
+            overflow="hidden"
+            textOverflow="ellipsis"
+          >
             {formatUsernames(conversation.participants, userId)}
           </Text>
           {conversation.latestMessage && (
-            <Box
-              width='140%'
-              maxWidth='360px'>
+            <Box width="140%" maxWidth="360px">
               <Text
-                color='whiteAlpha.700'
-                whiteSpace='nowrap'
-                overflow='hidden'
-                textOverflow='ellipsis'>
+                color="whiteAlpha.700"
+                whiteSpace="nowrap"
+                overflow="hidden"
+                textOverflow="ellipsis"
+              >
                 {conversation.latestMessage.body}
               </Text>
             </Box>
           )}
         </Flex>
         <Text
-          color='whiteAlpha.700'
-          textAlign='right'
-          position='absolute'
-          right={4}>
+          color="whiteAlpha.700"
+          textAlign="right"
+          position="absolute"
+          right={4}
+        >
           {formatRelative(new Date(conversation.updatedAt), new Date(), {
             locale: {
               ...enUS,
               formatRelative: (token) =>
-                formatRelativeLocale[token as keyof typeof formatRelativeLocale],
+                formatRelativeLocale[
+                  token as keyof typeof formatRelativeLocale
+                ],
             },
           })}
         </Text>

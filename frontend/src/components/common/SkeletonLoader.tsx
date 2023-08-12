@@ -1,4 +1,4 @@
-import { Skeleton } from '@chakra-ui/react';
+import { Skeleton } from "@chakra-ui/react";
 
 interface SkeletonLoaderProps {
   count: number;
@@ -6,16 +6,20 @@ interface SkeletonLoaderProps {
   width?: string;
 }
 
-const SkeletonLoader: React.FC<SkeletonLoaderProps> = ({ count, height, width }) => {
+const SkeletonLoader: React.FC<SkeletonLoaderProps> = ({
+  count,
+  height,
+  width,
+}) => {
   return (
     <>
       {[...Array(count)].map((_, i) => (
         <Skeleton
           key={i}
+          startColor="blackAlpha.400"
+          endColor="whiteAlpha.300"
           height={height}
-          width={{ base: 'full'}}
-          startColor='blackAlpha.400'
-          endColor='whiteAlpha.300'
+          width={{ base: "full" || width }}
           borderRadius={4}
         />
       ))}

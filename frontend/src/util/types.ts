@@ -1,6 +1,12 @@
-import { ConversationPopulated, MessagePopulated } from '../../../backend/src/util/types';
+import { Message } from "graphql-ws";
+import {
+  ConversationPopulated,
+  MessagePopulated,
+} from "../../../backend/src/util/types";
 
-// users
+/**
+ * Users
+ */
 export interface CreateUsernameData {
   createUsername: {
     success: boolean;
@@ -26,10 +32,13 @@ export interface SearchedUser {
   image: string;
 }
 
-// conversations
+/**
+ * Conversations
+ */
 export interface ConversationsData {
   conversations: Array<ConversationPopulated>;
 }
+
 export interface CreateConversationData {
   createConversation: {
     conversationId: string;
@@ -43,10 +52,18 @@ export interface CreateConversationInput {
 export interface ConversationUpdatedData {
   conversationUpdated: {
     conversation: ConversationPopulated;
-  }
+  };
 }
 
-// messages
+export interface ConversationDeletedData {
+  conversationDeleted: {
+    id: string;
+  };
+}
+
+/**
+ * Messages
+ */
 export interface MessagesData {
   messages: Array<MessagePopulated>;
 }
@@ -58,7 +75,7 @@ export interface MessagesVariables {
 export interface MessageSubscriptionData {
   subscriptionData: {
     data: {
-      messageSent: MessagePopulated
-    }
-  }
+      messageSent: MessagePopulated;
+    };
+  };
 }

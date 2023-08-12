@@ -1,22 +1,27 @@
-import { useMutation } from '@apollo/client';
-import { Box, Input } from '@chakra-ui/react';
-import { Session } from 'next-auth';
-import React, { useState } from 'react';
-import { toast } from 'react-hot-toast';
-import { SendMessageArguments } from '../../../../../../backend/src/util/types';
-import MessageOperations from '../../../../graphql/operations/message';
-import ObjectID from 'bson-objectid';
-import { MessagesData } from '@/util/types';
+import { useMutation } from "@apollo/client";
+import { Box, Input } from "@chakra-ui/react";
+import { Session } from "next-auth";
+import React, { useState } from "react";
+import { ObjectID } from "bson";
+import toast from "react-hot-toast";
+import { SendMessageArguments } from "../../../../../../backend/src/util/types";
+import MessageOperations from "../../../../graphql/operations/message";
+import { MessagesData } from "../../../../util/types";
+
 interface MessageInputProps {
   session: Session;
   conversationId: string;
 }
 
-const MessageInput: React.FC<MessageInputProps> = ({ session, conversationId }) => {
-  const [messageBody, setMessageBody] = useState('');
-  const [sendMessage] = useMutation<{ sendMessage: boolean }, SendMessageArguments>(
-    MessageOperations.Mutation.sendMessage
-  );
+const MessageInput: React.FC<MessageInputProps> = ({
+  session,
+  conversationId,
+}) => {
+  const [messageBody, setMessageBody] = useState("");
+  const [sendMessage] = useMutation<
+    { sendMessage: boolean },
+    SendMessageArguments
+  >(MessageOperations.Mutation.sendMessage);
 
   const onSendMessage = async (event: React.FormEvent) => {
     event.preventDefault();
@@ -32,7 +37,8 @@ const MessageInput: React.FC<MessageInputProps> = ({ session, conversationId }) 
         body: messageBody,
       };
 
-      setMessageBody('');
+      // Clear input state
+      setMessageBody("");
 
       const { data, errors } = await sendMessage({
         variables: {
@@ -74,29 +80,27 @@ const MessageInput: React.FC<MessageInputProps> = ({ session, conversationId }) 
       });
 
       if (!data?.sendMessage || errors) {
-        throw new Error('Failed to send message');
+        throw new Error("Failed to send message");
       }
     } catch (error: any) {
-      console.log('onSendMessage error', error);
+      console.log("onSendMessage error", error);
       toast.error(error?.message);
     }
   };
 
   return (
-    <Box
-      px={4}
-      py={6}
-      width='100%'>
+    <Box px={4} py={6} width="100%">
       <form onSubmit={onSendMessage}>
         <Input
           value={messageBody}
           onChange={(event) => setMessageBody(event.target.value)}
-          placeholder='New message'
-          resize='none'
+          placeholder="New message"
+          size="md"
+          resize="none"
           _focus={{
-            boxShadow: 'none',
-            border: '1px solid',
-            borderColor: 'whiteAlpha.300',
+            boxShadow: "none",
+            border: "1px solid",
+            borderColor: "whiteAlpha.300",
           }}
         />
       </form>

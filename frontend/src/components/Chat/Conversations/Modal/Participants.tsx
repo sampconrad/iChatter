@@ -1,6 +1,6 @@
-import { SearchedUser } from '@/util/types';
-import { Flex, Stack, Text } from '@chakra-ui/react';
-import { IoIosCloseCircleOutline } from 'react-icons/io';
+import { Flex, Stack, Text } from "@chakra-ui/react";
+import { SearchedUser } from "../../../../util/types";
+import { IoIosCloseCircleOutline } from "react-icons/io";
 
 interface ParticipantsProps {
   participants: Array<SearchedUser>;
@@ -20,10 +20,10 @@ const Participants: React.FC<ParticipantsProps> = ({
           align="center"
           bg="whiteAlpha.200"
           borderRadius={4}
-          p={2}>
+          p={2}
+        >
           <Text>{participant.username}</Text>
           <IoIosCloseCircleOutline
-            color="red"
             size={20}
             cursor="pointer"
             onClick={() => removeParticipant(participant.id)}
@@ -33,5 +33,4 @@ const Participants: React.FC<ParticipantsProps> = ({
     </Flex>
   );
 };
-
 export default Participants;

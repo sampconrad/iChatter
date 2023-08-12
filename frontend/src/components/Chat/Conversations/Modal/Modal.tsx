@@ -1,39 +1,62 @@
-import { CreateConversationData, CreateConversationInput, SearchedUser, SearchUsersData, SearchUsersInput } from '@/util/types';
-import { useLazyQuery, useMutation } from '@apollo/client';
-import { Button, Flex, Input, Modal, ModalBody, ModalCloseButton, ModalContent, ModalHeader, ModalOverlay, Stack } from '@chakra-ui/react';
-import React, { useState } from 'react';
-import { toast } from 'react-hot-toast';
-import UserOperations from '../../../../graphql/operations/user';
-import ConversationOperations from '../../../../graphql/operations/conversation';
-import Participants from './Participants';
-import UserSearchList from './UserSearchList';
-import { Session } from 'next-auth';
-import { useRouter } from 'next/router';
+import { useLazyQuery, useMutation, useQuery } from "@apollo/client";
+import {
+  Button,
+  Input,
+  Modal,
+  ModalBody,
+  ModalCloseButton,
+  ModalContent,
+  ModalHeader,
+  ModalOverlay,
+  Stack,
+  Text,
+} from "@chakra-ui/react";
+import React, { useState } from "react";
+import toast from "react-hot-toast";
+import UserOperations from "../../../../graphql/operations/user";
+import ConversationOperations from "../../../../graphql/operations/conversation";
+import {
+  CreateConversationData,
+  CreateConversationInput,
+  SearchedUser,
+  SearchUsersData,
+  SearchUsersInput,
+} from "../../../../util/types";
+import Participants from "./Participants";
+import UserSearchList from "./UserSearchList";
+import { Session } from "next-auth";
+import { useRouter } from "next/router";
 
-interface ConversationModalProps {
+interface ModalProps {
   session: Session;
   isOpen: boolean;
   onClose: () => void;
 }
 
-const ConversationModal: React.FC<ConversationModalProps> = ({ session, isOpen, onClose }) => {
+const ConversationModal: React.FC<ModalProps> = ({
+  session,
+  isOpen,
+  onClose,
+}) => {
   const {
     user: { id: userId },
   } = session;
 
   const router = useRouter();
 
-  const [username, setUsername] = useState('');
+  const [username, setUsername] = useState("");
   const [participants, setParticipants] = useState<Array<SearchedUser>>([]);
-  const [searchUsers, { data, error, loading }] = useLazyQuery<SearchUsersData, SearchUsersInput>(UserOperations.Queries.searchUsers);
-
-  const [createConversation, { loading: createConversationLoading }] = useMutation<CreateConversationData, CreateConversationInput>(
-    ConversationOperations.Mutations.createConversation
-  );
+  const [searchUsers, { data, error, loading }] = useLazyQuery<
+    SearchUsersData,
+    SearchUsersInput
+  >(UserOperations.Queries.searchUsers);
+  const [createConversation, { loading: createConversationLoading }] =
+    useMutation<CreateConversationData, CreateConversationInput>(
+      ConversationOperations.Mutations.createConversation
+    );
 
   const onCreateConversation = async () => {
     const participantIds = [userId, ...participants.map((p) => p.id)];
-    console.log('PARTICIPANT IDs', participantIds);
 
     try {
       const { data } = await createConversation({
@@ -43,7 +66,7 @@ const ConversationModal: React.FC<ConversationModalProps> = ({ session, isOpen, 
       });
 
       if (!data?.createConversation) {
-        throw new Error('Failed to create conversation');
+        throw new Error("Failed to create conversation");
       }
 
       const {
@@ -52,13 +75,15 @@ const ConversationModal: React.FC<ConversationModalProps> = ({ session, isOpen, 
 
       router.push({ query: { conversationId } });
 
-      // clear state and close modal on sucessful creation
+      /**
+       * Clear state and close modal
+       * on successful creation
+       */
       setParticipants([]);
-      setUsername('');
+      setUsername("");
       onClose();
-      
     } catch (error: any) {
-      console.log('onCreateConversation error', error);
+      console.log("onCreateConversation error", error);
       toast.error(error?.message);
     }
   };
@@ -66,12 +91,11 @@ const ConversationModal: React.FC<ConversationModalProps> = ({ session, isOpen, 
   const onSearch = (event: React.FormEvent) => {
     event.preventDefault();
     searchUsers({ variables: { username } });
-    console.log('HERE IS SEARCH DATA', data);
   };
 
   const addParticipant = (user: SearchedUser) => {
     setParticipants((prev) => [...prev, user]);
-    setUsername('');
+    setUsername("");
   };
 
   const removeParticipant = (userId: string) => {
@@ -80,29 +104,20 @@ const ConversationModal: React.FC<ConversationModalProps> = ({ session, isOpen, 
 
   return (
     <>
-      <Modal
-        isOpen={isOpen}
-        onClose={onClose}>
+      <Modal isOpen={isOpen} onClose={onClose}>
         <ModalOverlay />
-        <ModalContent
-          bg='brand.800'
-          pb={4}>
+        <ModalContent bg="#2d2d2d" pb={4}>
           <ModalHeader>Create a Conversation</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
             <form onSubmit={onSearch}>
               <Stack spacing={4}>
                 <Input
-                  placeholder='Enter a username'
+                  placeholder="Enter a username"
                   value={username}
                   onChange={(event) => setUsername(event.target.value)}
                 />
-                <Button
-                  type='submit'
-                  disabled={!username}
-                  isLoading={loading}
-                  bg='brand.500'
-                  _hover={{ color: 'brand.900', bg: 'brand.50' }}>
+                <Button type="submit" disabled={!username} isLoading={loading}>
                   Search
                 </Button>
               </Stack>
@@ -120,12 +135,13 @@ const ConversationModal: React.FC<ConversationModalProps> = ({ session, isOpen, 
                   removeParticipant={removeParticipant}
                 />
                 <Button
-                  bg='brand.100'
-                  width='100%'
+                  bg="brand.100"
+                  width="100%"
                   mt={6}
-                  _hover={{ color: 'brand.900', bg: 'brand.50' }}
+                  _hover={{ bg: "brand.100" }}
                   isLoading={createConversationLoading}
-                  onClick={onCreateConversation}>
+                  onClick={onCreateConversation}
+                >
                   Create Conversation
                 </Button>
               </>
@@ -136,5 +152,4 @@ const ConversationModal: React.FC<ConversationModalProps> = ({ session, isOpen, 
     </>
   );
 };
-
 export default ConversationModal;

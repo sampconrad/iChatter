@@ -1,5 +1,5 @@
-import { SearchedUser } from '@/util/types';
-import { Avatar, Button, Flex, Stack, Text } from '@chakra-ui/react';
+import { Avatar, Button, Flex, Stack, Text } from "@chakra-ui/react";
+import { SearchedUser } from "../../../../util/types";
 
 interface UserSearchListProps {
   users: Array<SearchedUser>;
@@ -27,15 +27,16 @@ const UserSearchList: React.FC<UserSearchListProps> = ({
               py={2}
               px={4}
               borderRadius={4}
-              _hover={{ bg: 'whiteAlpha.200' }}>
+              _hover={{ bg: "whiteAlpha.200" }}
+            >
               <Avatar src={user.image} />
               <Flex justify="space-between" align="center" width="100%">
                 <Text color="whiteAlpha.700">{user.username}</Text>
                 <Button
                   bg="brand.100"
-                  _hover={{ bg: 'brand.100' }}
-                  _active={{ bg: 'brand.200' }}
-                  onClick={() => addParticipant(user)}>
+                  _hover={{ bg: "brand.100" }}
+                  onClick={() => addParticipant(user)}
+                >
                   Select
                 </Button>
               </Flex>
@@ -46,5 +47,4 @@ const UserSearchList: React.FC<UserSearchListProps> = ({
     </>
   );
 };
-
 export default UserSearchList;

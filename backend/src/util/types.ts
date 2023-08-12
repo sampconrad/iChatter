@@ -1,19 +1,24 @@
-import { Message, Prisma, PrismaClient } from '@prisma/client';
-import { ISODateString } from 'next-auth';
-import { conversationPopulated, participantPopulated } from '../graphql/resolvers/conversation';
-import { Context } from 'graphql-ws/lib/server';
-import { PubSub } from 'graphql-subscriptions';
-import { messagePopulated } from '../graphql/resolvers/message';
+import { Prisma, PrismaClient } from "@prisma/client";
+import { PubSub } from "graphql-subscriptions";
+import { ISODateString } from "next-auth";
+import {
+  conversationPopulated,
+  participantPopulated,
+} from "../graphql/resolvers/conversation";
+import { messagePopulated } from "../graphql/resolvers/message";
+import { Context } from "graphql-ws/lib/server";
 
+/**
+ * Server Configuration
+ */
 export interface GraphQLContext {
   session: Session | null;
   prisma: PrismaClient;
   pubsub: PubSub;
 }
 
-// USERS
 export interface Session {
-  user: User;
+  user?: User;
   expires: ISODateString;
 }
 
@@ -23,6 +28,9 @@ export interface SubscriptionContext extends Context {
   };
 }
 
+/**
+ * Users
+ */
 export interface User {
   id: string;
   username: string;
@@ -37,7 +45,9 @@ export interface CreateUsernameResponse {
   error?: string;
 }
 
-// CONVERSATIONS
+/**
+ * Conversations
+ */
 export type ConversationPopulated = Prisma.ConversationGetPayload<{
   include: typeof conversationPopulated;
 }>;
@@ -49,13 +59,16 @@ export type ParticipantPopulated = Prisma.ConversationParticipantGetPayload<{
 export interface ConversationUpdatedSubscriptionPayload {
   conversationUpdated: {
     conversation: ConversationPopulated;
-  }
+  };
 }
+
 export interface ConversationDeletedSubscriptionPayload {
   conversationDeleted: ConversationPopulated;
 }
 
-// MESSAGES
+/**
+ * Messages
+ */
 export interface SendMessageArguments {
   id: string;
   conversationId: string;
@@ -67,4 +80,6 @@ export interface MessageSentSubscriptionPayload {
   messageSent: MessagePopulated;
 }
 
-export type MessagePopulated = Prisma.MessageGetPayload<{ include: typeof messagePopulated }>;
+export type MessagePopulated = Prisma.MessageGetPayload<{
+  include: typeof messagePopulated;
+}>;

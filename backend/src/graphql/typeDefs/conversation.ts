@@ -1,4 +1,4 @@
-import { gql } from 'graphql-tag';
+import gql from "graphql-tag";
 
 const typeDefs = gql`
   scalar Date
@@ -31,7 +31,6 @@ const typeDefs = gql`
     id: String
     latestMessage: Message
     participants: [Participant]
-    createdAt: Date
     updatedAt: Date
   }
 
